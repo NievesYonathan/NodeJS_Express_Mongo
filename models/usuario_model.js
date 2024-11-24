@@ -15,7 +15,7 @@ const usuarioSchema = new mongose.Schema({
     },
     estado: {
         type:Boolean,
-        required: true
+        default: true
     },
     imagen: {
         type:String,
