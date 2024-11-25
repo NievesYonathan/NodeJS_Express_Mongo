@@ -1,20 +1,10 @@
 const express = require('express');
-const Curso = require('../models/curso_model')
+const logic = require('../logic/curso_logic')
 const ruta = express.Router()
 
-// Función asincrona para crear cursos
-async function crarCurso(body){
-    let curso = new Curso({
-        titulo      : body.titulo,
-        descripcion : body.descripcion,
-        alumnos     : body.alumnos,
-        calificacion: body.calificacion
-    })
-    return await curso.save()
-}
-
+// Endpoint de tipo POST para crear usuarios
 ruta.post('/', (req, res)=>{
-    let resultado = crarCurso(req.body)
+    let resultado = logic.crearCurso(req.body)
 
     resultado.then( curso => {
         res.json({
@@ -27,20 +17,9 @@ ruta.post('/', (req, res)=>{
     })
 })
 
-// Función asincrónica para actualizar cursos
-async function actualizarCurso(id, body){
-    let curso = await Curso.findByIdAndUpdate(id, {
-        $set: {
-            titulo      : body.titulo,
-            descripcion : body.descripcion
-        }
-    }, {new: true})
-    return curso
-}
-
 // Endpoint de tipo PUT para el recurso CURSOS
 ruta.put('/:id', (req, res) => {
-    let resultado = actualizarCurso(req.params.id, req.body)
+    let resultado = logic.actualizarCurso(req.params.id, req.body)
     resultado.then(curso => {
         res.json(curso)
     }).catch(err => {
@@ -48,24 +27,10 @@ ruta.put('/:id', (req, res) => {
     })
 })
 
-// Función asíncrona para inactivar un objeto de tipo curso
-async function desactivarCurso(id) {
-    try {
-        let curso = await Curso.findByIdAndUpdate(id,
-            { 
-                $set: { estado: false } 
-            },{ new: true }
-        );
-        return curso
-    } catch (error) {
-        throw new Error('Error al intentar desactivar el curso: ' + error.message)
-    }
-}
-
 // Endpoint de tipo DELETE para desactivar datos del curso
 ruta.delete('/:id', async (req, res) => {
     try {
-        let curso = await desactivarCurso(req.params.id)
+        let curso = await logic.desactivarCurso(req.params.id)
         if (!curso) {
             return res.status(404).json({ error: 'Curso no encontrado' })
         }
@@ -75,15 +40,9 @@ ruta.delete('/:id', async (req, res) => {
     }
 })
 
-// Función asíncrona para listar todos los cursos activos
-async function listarCursosActivos() {
-    let cursos = await Curso.find({"estado": true})
-    return cursos
-}
-
 //Endpoint de tipo GET para el recurso curso
 ruta.get('/', (req, res)=>{
-    let resultado = listarCursosActivos()
+    let resultado = logic.listarCursosActivos()
 
     resultado.then( cursos => {
         res.json(cursos)
